@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import express from "express"
+import express, { Request, Response, NextFunction } from "express"
+import 'express-async-errors'
 import { router } from './routes';
 import './database'
 
@@ -9,12 +10,17 @@ app.use(express.json())
 
 app.use(router)
 
-app.get('/test', (request, response) => {
-  return response.send('Ola nlw')
-})
+app.use((err: Error, request: Request, response:Response, next: NextFunction) => {
+  if (err instanceof Error) {
+    return response.status(400).json({
+      error: err.message
+    })
+  }
 
-app.post('/test-post', (request, response) => {
-  return response.send('nlw metodo post')
+  return response.status(500).json({
+    status: 'error',
+    message: 'Internal Server Error'
+  })
 })
 
 app.listen(3000, () => console.log('server is running nlw'))
